@@ -16,19 +16,18 @@ Sample Output 1
 [[-8, 2, 6], [-8, 3, 5], [-6, 1, 5]]
 """
     
+
 def threeNumberSum(array, targetSum):
     # Write your code here.
     array.sort()
     n = len(array)
     result = []
     for i in range(n - 1):
-      m = i + 1
-      while m < n:
+      for m in range(i+1,n):
         num = targetSum - (array[i] + array[m]) 
         if num in array and num != array[i] and num != array[m]:
           if sorted([array[i], array[m], num]) not in result:
             result.append(sorted([array[i], array[m], num]))
-        m += 1
     return result
     
     
@@ -36,4 +35,5 @@ if __name__ == '__main__':
   array =  [12, 2, 1, 3, -6, 5, -8, 6]
   targetSum = 0
   print(threeNumberSum(array, targetSum))
+  
   
