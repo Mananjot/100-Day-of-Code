@@ -16,97 +16,109 @@ Sample output
 
 # Definition for singly-linked list.
 class ListNode:
-    def __init__(self, val=0, next=None):
-        self.val = val
-        self.next = next
+  def __init__(self, val=0, next=None):
+    self.val = val
+    self.next = next
+
+# Class to build the linked list that is to be returned as result
 class LinkedList:
   def __init__(self):
     self.head = None
-    self.tail = None
     self.count = 0
-  def append(self, val):
+  
+  # It creates our linked list. Actually it grows in backward direction adding head each time
+  def changeHead(self,val):
     if self.count == 0:
       self.head = ListNode(val)
     else:
-      pre_node = self.head
-      for _ in range(self.count - 1):
-        pre_node = pre_node.next
-      self.tail =  ListNode(val)
-      pre_node.next = self.tail
+      curr = ListNode(val, self.head)
+      self.head = curr
     self.count += 1
-    
-  def del_tail(self):
-    pre_node = self.head
-    for _ in range(self.count - 2):
-      pre_node = pre_node.next
-    pre_node.next = None
-    self.tail = pre_node
-    self.count -= 1
-      
-    
-  def display(self):
-    curr = self.head
-    for _ in range(self.count - 1):
-      print(curr.val, end =" -> ")
-      curr = curr.next
-    print(self.tail.val)
-      
-
-# The code runs absolutly fine if we take array as input and then convert it to the list using ListNode class then process the lists
-# The Test cases failed because the linked lists are defined at the backend where the number is converted to linked list and passed to the
-# addTwoNumbers Function and function used at the backend don't have attributes that i have used in my class  
-class Solution:
-    def addTwoNumbers(self, l1: ListNode, l2: ListNode) -> ListNode:
-      carry = 0
-      result = []
-      while l1.count > 0 and l2.count > 0:
-        a = l1.tail.val + l2.tail.val + carry
-        if a > 9:
-          a -=10
-          carry = 1
-        else:
-          carry = 0
-        l1.del_tail()
-        l2.del_tail()
-        result.append(a)
-     
-      for i in range(l1.count, 0, -1):
-        result.append(l1.tail.val)
-        l1.del_tail()
-      for i in range(l2.count, 0, -1):
-        result.append(l2.tail.val)
-        l2.del_tail()
-      if carry == 1:
-        result.append(1)
-      final_result = LinkedList()
-      n = len(result)
-      for i in range(n-1, -1,-1):
-        final_result.append(result[i])
-      return final_result.display()
         
-a1 = [7,2,4,3]
-a2 = [5,6,4]
-
-# a1 = [3,4,5,2,1,8,1]
-# a2 = [6,7,9,2]
-
-# a1 = [4,8,5,7]
-# a2 = [7,8,9,1]
-
-
-l1 = LinkedList()
-l2 = LinkedList()
-
-for i in range(len(a1)):
-  l1.append(a1[i])
+class Solution:
+  def __init__(self):
+    # Declaring the Linked List to store the result
+    self.sumList = LinkedList() 
   
-for i in range(len(a2)):
-  l2.append(a2[i])
+  # A method that runs recursively till it reaches the end of the list (least significant digit)
+  # And after computing the sum returns the carry to the calling function
+  # The carry than is added with previous two nodes (that were already stored in recursion stack) 
+  # At the every returning step the sum calculated is appended to 'sumList' and making that as head every time
+  # So at last the head of the list is at the most significant digit of the answer
+  def computeCarry(self,num1, num2, carry):
+    if num1.next == num2.next == None:
+      sum = num1.val + num2.val
+      if sum >= 10:
+        sum -= 10
+        carry = 1
+      self.sumList.changeHead(sum)
+      return carry
+    else:
+      sum = self.computeCarry(num1.next, num2.next, carry) + num1.val + num2.val
+      if sum >= 10:
+        sum -= 10
+        carry = 1
+      else:
+        carry = 0
+      self.sumList.changeHead(sum)
+      return carry
+      
+  def addTwoNumbers(self, l1: ListNode, l2: ListNode) -> ListNode:
+    l1Length = 0
+    l2Length = 0
+    l1Head = l1
+    l2Head = l2
+    
+    # Counting Lengths of Linked List
+    while l1Head != None:
+      l1Length += 1
+      l1Head = l1Head.next           
+        
+    while l2Head != None:
+      l2Length += 1
+      l2Head = l2Head.next  
+      
+    # Checking the lengths of the linked list and adding 0's to the smaller linked list
+    if l1Length < l2Length:
+      for _ in range(l2Length - l1Length):
+        curr = ListNode(0, l1)
+        l1 = curr
+    elif l1Length > l2Length:
+      for _ in range(l1Length - l2Length):
+        curr = ListNode(0, l2)
+        l2 = curr
+        
+    # Calling the recursive function
+    carry = self.computeCarry(l1, l2, 0)
+    
+    # Checking if there is carry even if the lists are added if so add it as most significant digit
+    if carry == 1:
+      self.sumList.changeHead(1)
+    
+    return self.sumList.head
+        
+""" 
+    
+Note: The Adding 0's to the list can be avoided by first trimming longer linked list and adding 
+the same length of list and then appending the longer list to result
+But the carry returned in the last addition may become difficut to handle in some cases
+Example --> 9999123 + 921
+Step 1 -->  123
+            921
+tempResult= 044
+Step 2 carry = 1 + 9 = 10 --append 0-- 0044
+Step 3 carry = 1 + 9 = 10 --append 0-- 00044
+Step 4 carry = 1 + 9 = 10 --append 0-- 000044
+Step 5 carry = 1 + 9 = 10 --append 0-- 0000044
+Step 6 --append carry = 1 -- 10000044
 
-# l1.display()
-# l2.display()
+Though this is to be carried in loop/recursively but the code the code becomes repetative
+as we will require to do the same kind of computation again that we have already done to compute 123 + 921
+
+It may be simple to add for the case like 12123 + 921 = 13044 as no carry is generated by the the remaining elements.
+But the code need to be same for both :)
+
+"""
 
 
-ans = Solution()
-print(ans.addTwoNumbers(l1,l2))
 
