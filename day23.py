@@ -32,6 +32,8 @@ False
 
 """
 
+"""
+# Brute Force Method --> O(n^2) time complexity
 def find_target(input_matrix,target):
   #write your code here
   m = len(input_matrix)
@@ -40,6 +42,25 @@ def find_target(input_matrix,target):
     for j in range(n):
       if input_matrix[i][j] == target:
         return True
+  return False
+"""
+
+#time complexity --> O(m + n) 
+def find_target(input_matrix,target):
+  #write your code here
+  m = len(input_matrix)
+  n = len(input_matrix[0])
+  i = 0
+  j = n - 1   
+  
+  # Start iterating from the first row and last column
+  while i < m and j > -1:
+    if input_matrix[i][j] == target:
+      return True
+    elif input_matrix[i][j] < target:     # If target is greater than the current element jump to next row
+      i +=1
+    else:                                 # If target is less than the current element start jumping to the previous column within same row
+      j -= 1
   return False
 
 if __name__ == "__main__":
