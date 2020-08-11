@@ -1,5 +1,4 @@
 """
-
 Question: Find Target
 
 Write an efficient algorithm that searches for a value in an m x n matrix. 
@@ -29,10 +28,10 @@ target = 13
 
 Sample Output 2
 False
-
 """
 
 """
+# Solution --> 1
 # Brute Force Method --> O(n^2) time complexity
 def find_target(input_matrix,target):
   #write your code here
@@ -45,6 +44,8 @@ def find_target(input_matrix,target):
   return False
 """
 
+"""
+# Solution --> 2
 #time complexity --> O(m + n) 
 def find_target(input_matrix,target):
   #write your code here
@@ -61,6 +62,39 @@ def find_target(input_matrix,target):
       i +=1
     else:                                 # If target is less than the current element start jumping to the previous column within same row
       j -= 1
+  return False
+"""
+
+"""
+# Solution --> 3
+The Problem is solved in the same manner as for searching in 1D list using binary search
+Manipulation has been done in the indices of input_matrix to access the elements
+
+Time Complexity --> O(logm + logn)
+"""
+
+def find_target(input_matrix,target):
+  #write your code here
+  m = len(input_matrix)                     # No. of Rows
+  n = len(input_matrix[0])                  # No. of Columns
+  
+  low = 0                                   # Index of the first element 
+  high = m * n - 1                          # Index of the last element as in 1D list
+
+  while low <= high:
+    mid_column = (low + high) // 2          # Gives the index of the middle element as in 1D List
+    mid_row = mid_column // n               # Gives the Row of the middle element (mid index is divided by no. of columns). This is the additional part for 2D List
+    
+    # To get the index of mid coloumn in 2D List take remainder with no. of elements in a row (i.e no. of columns) --> additional 
+    if input_matrix[mid_row][mid_column%n] == target:
+      return True
+    
+    if input_matrix[mid_row][mid_column%n] > target:
+      high = mid_column - 1
+  
+    elif input_matrix[mid_row][mid_column%n] < target:
+      low = mid_column + 1
+     
   return False
 
 if __name__ == "__main__":
